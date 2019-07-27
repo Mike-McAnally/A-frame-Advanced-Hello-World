@@ -1,0 +1,114 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,shrink-to-fit=no,user-scalable=no,maximum-scale=1,minimum-scale=1">
+    <title>A-frame Advanced Hello World</title>
+    <meta name="description" content="A-frame provides a hello world that is really remarkable, however you usually need to have controller selection, and environment movement.  With this example you get what works across the most headsets and controllers. By Michael McAnally July 26,2019 -with gratitude credit and respect given to the used github repositories."></meta>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+
+    <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
+    <script src="https://unpkg.com/aframe-text-geometry-component@0.5.1/dist/aframe-text-geometry-component.min.js"></script>
+
+    <!-- for creating Navmesh... Also uncomment a-scene inspector-plugin-recast
+    <script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script>
+-->
+    <script type="text/javascript">
+
+      // Component to do on click.
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+
+            this.el.addEventListener('click', function (evt) {
+
+                // remove clicked object from view
+                this.setAttribute('visible', false);
+                //slower...
+                //document.getElementById('cube').setAttribute('visible', false);
+
+
+            });
+        }
+      });
+
+      function doSomethingElse() {
+        //window.location.href="https://rocketvirtual.com";
+        document.getElementById('sphere').setAttribute('color', 'purple');
+      }
+
+      //   Solves Google mute of audio problem (and it is...) https://stackoverflow.com/questions/47921013/play-sound-on-click-in-a-frame?answertab=active#tab-top
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+
+                if(!playing) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                playing = !playing;
+            });
+        }
+      })
+
+  </script>
+
+  </head>
+  <body>
+
+    <button id="playButton" type="button">Play Music</button>
+    <!-- I like the sound of this fun, joyful Carnival Banna tune for game: this "Royalty Purchase" for 10,000 downloads -->
+    <audio id="playAudio" autoplay loop>
+<!--        <source src="https://yourdomain.com/webvr/mp3/your.mp3" type="audio/mpeg">  -->
+    </audio>
+
+<!-- used for creating Navmesh... see javascript component above <a-scene inspector-plugin-recast>  https://github.com/donmccurdy/aframe-inspector-plugin-recast-->
+
+
+    <a-scene background="color: #FAFAFA">
+
+      <a-assets>
+            <a-asset-item id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
+      </a-assets>
+
+      <!-- nav-mesh: protecting us from running thru sphere, cube and cylinder  -->
+      <a-entity gltf-model="../gltf/navmesh-helloworld.gltf" visible="false" nav-mesh=""></a-entity>
+
+
+      <!-- Create the Park environment -->
+      <a-entity id="park" environment="preset: forest"></a-entity>
+
+      <!-- Basic movement, selection and teleport  -->
+      <a-entity id="rig" movement-controls="constrainToNavMesh: true;" position="0 0 5">
+            <a-entity id="cam" camera position="0 1.6 0" look-controls="pointerLockEnabled: true"></a-entity>
+                
+                <a-entity id="leftController" hand-controls="left" tracked-controls vive-controls="hand: left" oculus-touch-controls="hand: left"
+                 windows-motion-controls="hand: left" teleport-controls="cameraRig: #rig; button: trigger; curveShootingSpeed: 20;" visible="true"></a-entity>
+
+                <a-entity id="rightController" hand-controls="right" tracked-controls vive-controls="hand: right" oculus-touch-controls="hand: right"
+                 windows-motion-controls="hand: right" laser-controls raycaster="showLine: true; far: 20; interval: 0; objects: .clickable, a-link;" line="color: lawngreen; opacity: 0.5" visible="true"></a-entity>
+      
+      </a-entity>
+
+      <!-- Normal Hello World objects   -->
+      <a-box id="cube" class="clickable" position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9" visible="true" shadow  onclick="doSomethingElse();" click-listener></a-box>
+      <a-sphere id="sphere" position="0 1.25 -5" radius="1.25" color="#EF2D5E" shadow></a-sphere>
+      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" shadow></a-cylinder>
+      <a-plane position="0 0.001 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
+
+      <a-entity position="-3.44 2.801 -5.127" text-geometry="value: Advanced"></a-entity>
+      <a-entity position="-0.05 2.793 -5.090" text-geometry="value: Hello World; font: #optimerBoldFont"></a-entity>
+
+    </a-scene>
+  </body>
+</html>
