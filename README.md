@@ -16,5 +16,5 @@ https://github.com/donmccurdy/aframe-extras
 A-frame Teleport Controls
 https://github.com/fernandojsg/aframe-teleport-controls
 
-A-Frame Text Geometry Component
+A-frame Text Geometry Component
 https://github.com/supermedium/superframe/tree/master/components/text-geometry
