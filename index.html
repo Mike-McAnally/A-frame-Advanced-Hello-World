@@ -4,23 +4,93 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,shrink-to-fit=no,user-scalable=no,maximum-scale=1,minimum-scale=1">
-    <title>A-frame Advanced Hello World</title>
-    <meta name="description" content="A-frame provides a hello world that is really remarkable, however you usually need to have controller selection, and environment movement.  With this example you get what works across the most headsets and controllers. By Michael McAnally July 26,2019 -with gratitude credit and respect given to the used github repositories."></meta>
+    <title>My A-frame Advanced Hello World</title>
+    <meta name="description" content="A-frame provides a hello world that is really remarkable, however you usually need to have controller selection, and environment movement.  With this examples you get what works across the most headsets and controllers. By Michael McAnally August 19, 2019 -with gratitude credit and respect given to the used github repositories."></meta>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+<!-- A-frame component libraries -->
+    <script src="https://rocketvirtual.com/aframe-master_9.2_old3/dist/aframe-master.min.js"></script>
+    <script src="https://rocketvirtual.com/aframe-environment-component-master/dist/aframe-environment-component.js"></script>
+    <script src="https://rocketvirtual.com/aframe-extras-master/dist/aframe-extras.min.js"></script>
+    <script src="https://rocketvirtual.com/aframe-teleport-controls-master/dist/aframe-teleport-controls.min.js"></script>
+    <script src="https://rocketvirtual.com/superframe-master/components/text-geometry/dist/aframe-text-geometry-component.min.js"></script>
+<!-- extra stuff for later on... you can look them up on github  -->
+    <script src="https://rocketvirtual.com/aframe-alongpath-component-master/dist/aframe-alongpath-component.min.js" ></script>
+    <script src="https://rocketvirtual.com/aframe-curve-component-master/dist/aframe-curve-component.min.js"></script>
+    <script src="https://rocketvirtual.com/aframe-mouse-cursor-component-master/dist/aframe-mouse-cursor-component.min.js"></script>
+    <script src="https://rocketvirtual.com/aframe-multisrc-component-master/dist/aframe-multisrc-component.js"></script>
 
-    <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
-    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
-    <script src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
-    <script src="https://unpkg.com/aframe-text-geometry-component@0.5.1/dist/aframe-text-geometry-component.min.js"></script>
-
-    <!-- for creating Navmesh... Also uncomment a-scene inspector-plugin-recast
+<!-- see a-frame scene below https://github.com/donmccurdy/aframe-inspector-plugin-recast
     <script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script>
 -->
+
+    <style type="text/css">
+      #video-permission {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: white;
+          z-index: 10000;
+          display: none;
+      }
+      #video-permission-button {
+        position: fixed;
+        top: calc(50% - 1em);
+        left: calc(50% - 60px);
+        width: 120px;
+        height: 2em;
+      }
+    </style>
+
+
     <script type="text/javascript">
+
+      // Sound effects for objects loaded
+      var thrust = new Audio('https://rocketvirtual.com/webvr/mp3/rocket.mp3');
+      var zap = new Audio('https://rocketvirtual.com/webvr/mp3/raygun.mp3');
+
+      // environment setting for changing planets when cylinder is "clicked"
+      var planets = ["forest", "yavapai", "contact", "egypt", "checkerboard", "goaland", "goldmine", "threetowers", "poison", "arches", "tron", "dream", "volcano", "starry", "osiris"];
+
+      var m = 1;  //counter to visit another planet 
+
+      function changePlanet() {
+          m = m + 1;
+          if (m > planets.length)  { 
+              m = 0;  //reset to array beginning
+          }
+        // change our environment, may pause play for a moment and redraw
+        document.getElementById('onplanet').setAttribute('environment', 'preset: ' + planets[m]);
+      }
+
+
+      // royalty free sounds
+      function shoot_raygun(carousel_object) {
+
+          switch(carousel_object) {
+
+            case "rocket":
+              thrust.play();
+              document.getElementById('sittingDuckH').setAttribute('visible', false);
+              document.getElementById('sittingDuckI').setAttribute('visible', true);
+            break;
+
+            case "raygun":
+              zap.play();
+              document.getElementById('sittingDuckH').setAttribute('visible', true);
+              document.getElementById('sittingDuckI').setAttribute('visible', false);
+            break;
+
+            default:
+
+          }
+
+      }
+
 
       // Component to do on click.
       AFRAME.registerComponent('click-listener', {
@@ -43,7 +113,7 @@
         document.getElementById('sphere').setAttribute('color', 'purple');
       }
 
-      //   Solves Google mute of audio problem (and it is...) https://stackoverflow.com/questions/47921013/play-sound-on-click-in-a-frame?answertab=active#tab-top
+      //   audio problem (and it is...) https://stackoverflow.com/questions/47921013/play-sound-on-click-in-a-frame?answertab=active#tab-top
       AFRAME.registerComponent('audiohandler', {
         init:function() {
             let playing = false;
@@ -61,54 +131,319 @@
         }
       })
 
+
+
+
+
   </script>
 
   </head>
   <body>
 
+    <div id="video-permission">
+      <button id="video-permission-button">Allow VR Video</button>
+    </div>
+
     <button id="playButton" type="button">Play Music</button>
     <!-- I like the sound of this fun, joyful Carnival Banna tune for game: this "Royalty Purchase" for 10,000 downloads -->
     <audio id="playAudio" autoplay loop>
-<!--        <source src="https://yourdomain.com/webvr/mp3/your.mp3" type="audio/mpeg">  -->
+        <source src="https://rocketvirtual.com/webvr/mp3/Carnival_Banana.mp3" type="audio/mpeg">
     </audio>
 
 <!-- used for creating Navmesh... see javascript component above <a-scene inspector-plugin-recast>  https://github.com/donmccurdy/aframe-inspector-plugin-recast-->
 
-
-    <a-scene background="color: #FAFAFA">
+    <a-scene>
 
       <a-assets>
-            <a-asset-item id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
+            <video crossorigin="anonymous" id="video-src" src="https://rocketvirtual.com/video/ggblowtide2017.mp4"></video>
+
+            <a-asset-item id="rocket" src="https://rocketvirtual.com/webvr/gltf/rocket4.glb" shadow="receive: false"></a-asset-item>
+            <a-asset-item id="raygun" src="https://rocketvirtual.com/webvr/gltf/raygun4/raygun.glb" shadow="receive: false"></a-asset-item>
+
+            <a-asset-item crossorigin="anonymous" id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+            <img crossorigin="anonymous" src="https://rocketvirtual.com/images/play.png" id="play" >
+            <img crossorigin="anonymous" src="https://rocketvirtual.com/images/pause.png" id="pause" >
+            <img crossorigin="anonymous" src="https://rocketvirtual.com/images/volume-normal.png" id="volume-normal" >
+            <img crossorigin="anonymous" src="https://rocketvirtual.com/images/volume-mute.png" id="volume-mute" >
+            <img crossorigin="anonymous" src="https://rocketvirtual.com/images/seek-back.png" id="seek-back" >
+            <img crossorigin="anonymous" src="https://rocketvirtual.com/images/speech.png" id="speech" >
       </a-assets>
 
       <!-- nav-mesh: protecting us from running thru sphere, cube and cylinder  -->
-      <a-entity gltf-model="../gltf/navmesh-helloworld.gltf" visible="false" nav-mesh=""></a-entity>
-
+      <a-entity id="navmesh-step" gltf-model="../gltf/navmesh_stepsup.gltf" visible="false" nav-mesh=""></a-entity>
 
       <!-- Create the Park environment -->
-      <a-entity id="park" environment="preset: forest"></a-entity>
+      <a-entity id="onplanet" environment="preset: forest"></a-entity>
 
       <!-- Basic movement, selection and teleport  -->
       <a-entity id="rig" movement-controls="constrainToNavMesh: true;" position="0 0 5">
             <a-entity id="cam" camera position="0 1.6 0" look-controls="pointerLockEnabled: true"></a-entity>
                 
-                <a-entity id="leftController" hand-controls="left" tracked-controls vive-controls="hand: left" oculus-touch-controls="hand: left"
-                 windows-motion-controls="hand: left" teleport-controls="cameraRig: #rig; button: trigger; curveShootingSpeed: 20;" visible="true"></a-entity>
+            <a-entity id="leftController" hand-controls="left" tracked-controls vive-controls="hand: left" oculus-touch-controls="hand: left"
+                 windows-motion-controls="hand: left" teleport-controls="cameraRig: #rig; button: trigger; curveShootingSpeed: 10; collisionEntities: #navmesh-step;" visible="true" scale="0.5 0.5 0.5"  ></a-entity>
 
-                <a-entity id="rightController" hand-controls="right" tracked-controls vive-controls="hand: right" oculus-touch-controls="hand: right"
-                 windows-motion-controls="hand: right" laser-controls raycaster="showLine: true; far: 20; interval: 0; objects: .clickable, a-link;" line="color: lawngreen; opacity: 0.5" visible="true"></a-entity>
-      
+            <a-entity id="rightController" hand-controls="right" tracked-controls vive-controls="hand: right" oculus-touch-controls="hand: right"
+                 windows-motion-controls="hand: right" laser-controls raycaster="showLine: true; far: 20; interval: 0; objects: .clickable, a-link;" line="color: lawngreen; opacity: 0.5" visible="true" scale="0.5 0.5 0.5" ></a-entity>
+
       </a-entity>
 
       <!-- Normal Hello World objects   -->
-      <a-box id="cube" class="clickable" position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9" visible="true" shadow  onclick="doSomethingElse();" click-listener></a-box>
+      <a-box id="cube" class="clickable" position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9" visible="true" shadow onclick="doSomethingElse();" click-listener></a-box>
       <a-sphere id="sphere" position="0 1.25 -5" radius="1.25" color="#EF2D5E" shadow></a-sphere>
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" shadow></a-cylinder>
+      <a-cylinder id="cylinder" class="clickable"  position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" shadow onclick="changePlanet();"></a-cylinder>
       <a-plane position="0 0.001 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
 
+      <!-- Some 3D Font text   -->
       <a-entity position="-3.44 2.801 -5.127" text-geometry="value: Advanced"></a-entity>
       <a-entity position="-0.05 2.793 -5.090" text-geometry="value: Hello World; font: #optimerBoldFont"></a-entity>
 
+      <!-- 6 Upward teleport steps: it is possible to go up steps to higher levels using the navemesh recast ant objects to teleport on to...   -->
+      <a-box id="step-1" position="-5.26077 0.65874 -4" rotation="-90 0 0" scale="1 1 0.025" width="4" height="4" color="#FFFFFF" shadow="" material="" ></a-box>
+      <a-box id="step-2" position="-0.10215 3.21591 1.32841" rotation="-90 0 0" scale="1 1 0.025" width="4" height="4" color="#FFFFFF" shadow="" material="" ></a-box>
+      <a-box id="step-3" position="-5.26 0.659 -4.00" rotation="-90 0 0" scale="1 1 0.025" width="4" height="4" color="#FFFFFF" shadow="" material="" ></a-box>
+      <a-box id="step-4" position="4.554 4.854 -6.674" rotation="-90 0 0" scale="1 1 0.025" width="4" height="4" color="#FFFFFF" shadow="" material="" ></a-box>
+      <a-box id="step-5" position="-5.26 8.203 -4.347" rotation="-90 0 0" scale="1 1 0.025" width="4" height="4" color="#FFFFFF" shadow="" material="" ></a-box>
+      <a-box id="step-6" position="2.477 10.74 0.793" rotation="-90 0 0" scale="1 1 0.025" width="4" height="4" color="#FFFFFF" shadow="" material="" ></a-box>
+
+<!-- Setup 2 tracs H & I for the looping object.  Not a true circle, but it works...  Varying the y-axis for height in air of object following trac.  Could be more complex tracks in the future. -->
+    <a-curve id="tracH" curve="">
+        <a-curve-point position="-2 10 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-4 10 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-10 10 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-15 10 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-17 10 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-15 10 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-10 10 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-4 10 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-2 10 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+
+    <a-curve id="tracI" curve="">
+        <a-curve-point position="-12 1 1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-14 1 9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-9 1 14" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-1 1 12" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="1 1 7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-1 1 2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-6 1 -1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-12 1 1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+
+    <!-- objects following the trac.  Letter H & I corresponds to trac curve above.  glTF objects loaded Note: All objects are royalty free and/or created by me. -->
+    <a-entity id="sittingDuckH" class="clickable" gltf-model="#rocket" alongpath="curve:#tracH;loop:true;dur:14000;rotate:true" position="-16.13 1 4.16" shadow="receive:false" rotation="0 23.64 0" scale="3.5 3.5 3.5" onclick="shoot_raygun('rocket');" cursor-listener></a-entity>
+
+    <a-entity id="sittingDuckI" class="clickable" gltf-model="#raygun" scale="" alongpath="curve:#tracI;loop:true;dur:12000;rotate:true" position="0.98 1 6.65" shadow="receive:false" rotation="0 -175.74 0" onclick="shoot_raygun('raygun');" cursor-listener></a-entity>
+
+
+<!-- Controls for display of video screen, seems to work nicely, javascript below </scene> tag below -->
+     
+          <!-- MEDIAS HOLDER -->
+          <a-sound id="alert-sound" src="src: url(https://rocketvirtual.com/webvr/assets/action.wav)" autoplay="false" position="0 0 0"></a-sound>
+          <a-video id="video-screen" src="#video-src" position="0 3.119 -9.575" width="8" height="4" rotation="0 0 0" visible="false"></a-video>
+          <!-- END MEDIAS HOLDER -->
+
+          <!-- CONTROLS -->
+          <a-image class="clickable" id="control-back" width="0.4" height="0.4" src="#seek-back" position="-0.8 0.6 -0.876" visible="false" scale="0.85 0.85 0.85"></a-image>
+          <a-image class="clickable" id="control-play" width="0.4" height="0.4" src="#play" position="0 0.6 -0.876"></a-image>
+          <a-image class="clickable" id="control-volume" width="0.4" height="0.4" src="#volume-mute" position="0.8 0.6 -0.876" visible="false" scale="0.75 0.75 0.75"></a-image>
+          <!-- END CONTROLS -->
+
+          <!-- PROGRESSBAR -->
+          <a-entity id="progress-bar" geometry="primitive:plane;height:0.1;width:4" material="opacity:0;transparent:true;visible:false" position="0 0.987 -9.575" rotation="0 0 0">
+          <a-plane id="progress-bar-track" width="4" height="0.1" color="gray" position="0 0 0" opacity="0.2" visible="false"></a-plane>
+          <a-plane id="progress-bar-fill" width="1.3027969689224046" height="0.1" color="#7198e5" position="-1.3486015155387978 0 0.01" geometry="" visible="false"></a-plane>
+          <!-- END PROGRESSBAR -->
+
     </a-scene>
+
+    <script type="text/javascript">
+      var AVideoPlayer = function() {
+      // Vals
+      this.duration         = 0;
+      this.current_progress = 0;
+      this.progressWidth    = 4;
+      this.paused           = true;
+      // Elems
+      this.elProgressBar   = null;
+      this.elProgressTrack = null;
+      this.elProgressFill  = null;
+      this.elAlertSound    = null;
+      this.elVideo         = null;
+      this.elVideoScreen   = null;
+      this.elControlBack   = null;
+      this.elControlPlay   = null;
+      this.elControlVolume = null;
+      this._initElements = function() {
+        this.elProgressBar   = document.getElementById('progress-bar');
+        this.elProgressTrack = document.getElementById('progress-bar-track');
+        this.elProgressFill  = document.getElementById('progress-bar-fill');
+        this.elAlertSound    = document.getElementById('alert-sound');
+        this.elVideo         = document.getElementById('video-src');
+        this.elVideoScreen   = document.getElementById('video-screen');
+        this.elControlBack   = document.getElementById('control-back');
+        this.elControlPlay   = document.getElementById('control-play');
+        this.elControlVolume = document.getElementById('control-volume');
+      }
+      /**
+      * PROGRESS
+      */
+      this.setProgress = function(progress) {
+        var new_progress = this.progressWidth*progress;
+        this._setProgressWidth(new_progress);
+        var progress_coord = this._getProgressCoord();
+        if (progress_coord != undefined) {
+         progress_coord.x = -(this.progressWidth-new_progress)/2;
+         this._setProgressCoord(progress_coord);
+        }
+      }
+      this._getProgressCoord = function() {
+        return AFRAME.utils.coordinates.parse(this.elProgressFill.getAttribute("position"))
+      }
+      this._getProgressWidth = function() {
+        return parseFloat(this.elProgressFill.getAttribute("width"));
+      }
+      this._setProgressCoord = function(coord) {
+        this.elProgressFill.setAttribute("position", coord);
+      }
+      this._setProgressWidth = function(width) {
+        this.elProgressFill.setAttribute("width", width);
+      }
+      /*
+      * UI SETTERS
+      */
+      this.isProgressBarVisible = function(isVisible) {
+        this.elProgressTrack.setAttribute("visible", isVisible);
+        this.elProgressFill.setAttribute("visible", isVisible);
+      }
+      this.isControlVisible = function(isVisible) {
+        this.elControlBack.setAttribute("visible", isVisible);
+        this.elControlVolume.setAttribute("visible", isVisible);
+        this.elVideoScreen.setAttribute("visible", isVisible);
+      }
+      /*
+      * EVENTS
+      */
+      this._addPlayerEvents = function() {
+        var that = this;
+        this.elVideo.pause();
+        this.elVideo.onplay = function() {
+          that.duration = this.duration;
+        }
+        this.elVideo.ontimeupdate = function() {
+          if (that.duration > 0) {
+            that.current_progress = this.currentTime/that.duration;
+          }
+          that.setProgress(that.current_progress);
+        }
+      }
+      this._addControlsEvent = function() {
+        var that = this;
+        this.elControlPlay.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.paused) {
+            this.setAttribute('src', '#pause');
+            that.elVideo.play();
+            that.paused = false;
+            that.isProgressBarVisible(true);
+            that.isControlVisible(true);
+          } else {
+            this.setAttribute('src', '#play');
+            that.elVideo.pause();
+            that.paused = true;
+            that.isProgressBarVisible(false);
+            that.isControlVisible(false);
+         }
+        });
+        this.elControlVolume.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.muted) {
+            that.elVideo.muted = false;
+            this.setAttribute('src', '#volume-normal');
+          } else {
+            that.elVideo.muted = true;
+            this.setAttribute('src', '#volume-mute');
+          }
+        });
+        this.elControlBack.addEventListener('click', function () {
+          that._playAudioAlert();
+          that.elVideo.currentTime = 0;
+        });
+      }
+      this._addProgressEvent = function() {
+        var that = this;
+        this.elProgressBar.addEventListener('click', function (e) {
+          if (e.detail == undefined || e.detail.intersection == undefined || that.duration === 0) {
+            return;
+          }
+          let seekedPosition = (e.detail.intersection.point.x+(that.progressWidth/2))/that.progressWidth;
+          try {
+            let seekedTime = seekedPosition*that.duration;
+            that.elVideo.currentTime = seekedTime;
+          } catch (e) {
+          }
+        });
+      }
+      this._playAudioAlert = function() {
+        if (this.elAlertSound.components !== undefined && this.elAlertSound.components.sound !== undefined) {
+         this.elAlertSound.components.sound.playSound();
+        }
+      }
+      /**
+      * MOBILE PATCH TO PLAY VIDEO
+      */
+      this._mobileFriendly = function() {
+        if (AFRAME.utils.device.isMobile()) {
+          var that = this;
+          let video_permission        = document.getElementById('video-permission');
+         let video_permission_button = document.getElementById('video-permission-button');
+          video_permission.style.display = 'block';
+          video_permission_button.addEventListener("click", function() {
+            video_permission.style.display = 'none';
+            that.elVideo.play();
+            that.elVideo.pause();
+          }, false);
+        }
+      }
+      this.init = function() {
+        this._initElements();
+        //this._determinateProgressWidth();
+        this.setProgress(this.current_progress);
+        this._addPlayerEvents();
+        this._addControlsEvent();
+        this._addProgressEvent();
+        this._mobileFriendly();
+      }
+      this.init();
+    }
+      let scene = document.querySelector('a-scene');
+      var cursor = document.querySelector('a-cursor');
+      /**
+      * CINEMA MODE
+      */
+      scene.lightOff = function() {
+        scene.islightOn = true;
+        scene.removeAttribute('animation__fogback');
+        scene.setAttribute('animation__fog', "property: fog.color; to: #0c192a; dur: 800; easing: easeInQuad;");
+      }
+      scene.lightOn = function() {
+        scene.islightOn = false;
+        scene.removeAttribute('animation__fog');
+        scene.setAttribute('animation__fogback', "property: fog.color; to: #dbdedb; dur: 800");
+      }
+      /**
+      * AVideoPlayer
+      */
+      var videoPlayer = new AVideoPlayer();
+      document.querySelector('#control-play').addEventListener('click', function () {
+        if (videoPlayer.paused) {
+          scene.lightOn()
+        } else {
+          scene.lightOff();
+        }
+      });
+    </script>
+
+
   </body>
 </html>
