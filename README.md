@@ -4,7 +4,7 @@
 https://www.youtube.com/embed/lm52AfjjKaY?start=66&amp;controls=1"
 
 
-Demo link: https://rocketvirtual.com/html/A-frame_Advanced_Hello_World.html
+Demo link: https://rocketvirtual.com/html/VAHW5.html
 
 A-frame WebVR Virtual Reality Advanced Hello World
 
